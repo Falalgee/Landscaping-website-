@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}*:focus-visible{outline:2px solid #50634f;outline-offset:2px;border-radius:inherit;}::-webkit-scrollbar{display:none;}.material-symbols-outlined{font-variation-settings:'opsz' 24,'wght' 400,'FILL' 0,'GRAD' 0;}}
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATION SYSTEM — shared across all pages
+═══════════════════════════════════════════════════════════ */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms var(--ease-out-expo), transform 600ms var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal[data-delay="1"] { transition-delay: 80ms; }
+.reveal[data-delay="2"] { transition-delay: 160ms; }
+.reveal[data-delay="3"] { transition-delay: 240ms; }
+.reveal[data-delay="4"] { transition-delay: 320ms; }
+
+.card-interactive {
+  transition: border-color 240ms var(--ease-out-quart), transform 300ms var(--ease-out-expo), box-shadow 300ms var(--ease-out-expo), opacity 240ms var(--ease-out-quart);
+}
+.card-interactive:hover { transform: translateY(-2px); box-shadow: 0 6px 20px -8px rgba(5, 27, 18, 0.10); }
+.card-interactive img { transition: transform 700ms var(--ease-out-expo); }
+.card-interactive:hover img { transform: scale(1.03); }
+
+button, a[data-path], a[href^="tel:"] {
+  transition: background-color 200ms var(--ease-out-quart), border-color 200ms var(--ease-out-quart), color 200ms var(--ease-out-quart), transform 120ms var(--ease-out-quart);
+}
+button:active, a[data-path]:active, a[href^="tel:"]:active { transform: scale(0.98); }
+
+.mobile-nav-panel { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 320ms var(--ease-out-expo), opacity 240ms var(--ease-out-quart); }
+#mobile-nav:checked ~ .mobile-nav-panel { max-height: 520px; opacity: 1; }
+
+/* Before/after slider — handle idle pulse */
+@keyframes handle-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(5, 27, 18, 0.25); }
+  50% { box-shadow: 0 0 0 8px rgba(5, 27, 18, 0.0); }
+}
+.slider-handle-knob { animation: handle-pulse 2400ms ease-in-out infinite; }
+
+/* Gallery filter fade */
+.gallery-card.is-filtered-out {
+  opacity: 0;
+  transform: scale(0.97) translateY(4px);
+  pointer-events: none;
+  transition: opacity 240ms var(--ease-out-quart), transform 240ms var(--ease-out-quart);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+  .slider-handle-knob { animation: none; }
+}
+</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary":"#ffffff","primary-fixed":"#cfe9d9","surface-container-lowest":"#ffffff","on-error-container":"#93000a","inverse-primary":"#b3ccbe","on-error":"#ffffff","on-tertiary-container":"#ca815e","on-secondary-fixed-variant":"#394b38","surface":"#fbf9f5","surface-dim":"#dbdad6","inverse-on-surface":"#f2f0ed","primary-container":"#1a3026","surface-container-low":"#f5f3ef","tertiary-container":"#4d1d03","surface-tint":"#4c6358","on-tertiary-fixed-variant":"#6f371b","on-tertiary-fixed":"#351000","surface-bright":"#fbf9f5","background":"#fbf9f5","on-background":"#1b1c1a","on-surface":"#1b1c1a","outline-variant":"#c2c8c3","surface-container-high":"#eae8e4","inverse-surface":"#30312e","on-surface-variant":"#424844","primary-fixed-dim":"#b3ccbe","error-container":"#ffdad6","surface-variant":"#e4e2de","secondary-fixed":"#d3e8ce","secondary-container":"#d0e6cc","on-primary":"#ffffff","secondary-fixed-dim":"#b7ccb3","on-secondary-container":"#556853","tertiary-fixed":"#ffdbcc","tertiary-fixed-dim":"#ffb694","outline":"#727974","on-primary-fixed-variant":"#354c40","tertiary":"#2e0d00","surface-container-highest":"#e4e2de","on-primary-container":"#80988b","on-tertiary":"#ffffff","on-primary-fixed":"#092016","secondary":"#50634f","error":"#ba1a1a","on-secondary-fixed":"#0e1f0f","primary":"#051b12","surface-container":"#efeeea"},borderRadius:{DEFAULT:"4px",sm:"4px",md:"6px",lg:"8px",xl:"12px","2xl":"16px",full:"9999px"},boxShadow:{xs:"0 1px 2px 0 rgba(5,27,18,0.04)","sm":"0 1px 2px 0 rgba(5,27,18,0.05),0 1px 1px 0 rgba(5,27,18,0.03)","md":"0 2px 4px -1px rgba(5,27,18,0.06),0 2px 2px -1px rgba(5,27,18,0.03)","lg":"0 4px 10px -2px rgba(5,27,18,0.06),0 2px 4px -2px rgba(5,27,18,0.04)"},spacing:{"space-md":"1.25rem",margin:"1.25rem","space-xs":"0.375rem",gutter:"1.5rem","space-lg":"2rem","margin-desktop":"4rem","gutter-desktop":"2.5rem","space-sm":"0.75rem","space-xl":"3.5rem"},fontFamily:{"display":["Playfair Display","Georgia","serif"],"sans":["Plus Jakarta Sans","ui-sans-serif","system-ui","sans-serif"],"headline-lg":["Playfair Display"],"headline-md":["Playfair Display"],"headline-sm":["Plus Jakarta Sans"],"display-lg":["Playfair Display"],"display-lg-mobile":["Playfair Display"],"headline-lg-mobile":["Playfair Display"],"body-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"]},fontSize:{"display-lg":["52px",{lineHeight:"1.08",letterSpacing:"-0.022em",fontWeight:"400"}],"display-lg-mobile":["34px",{lineHeight:"1.12",letterSpacing:"-0.018em",fontWeight:"400"}],"headline-lg":["32px",{lineHeight:"1.2",letterSpacing:"-0.018em",fontWeight:"500"}],"headline-lg-mobile":["26px",{lineHeight:"1.25",letterSpacing:"-0.015em",fontWeight:"500"}],"headline-md":["22px",{lineHeight:"1.3",letterSpacing:"-0.012em",fontWeight:"500"}],"headline-sm":["16px",{lineHeight:"1.4",letterSpacing:"-0.005em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"1.6",fontWeight:"400"}],"body-md":["14.5px",{lineHeight:"1.6",fontWeight:"400"}],"body-sm":["13px",{lineHeight:"1.55",fontWeight:"400"}],"label-lg":["13.5px",{lineHeight:"1.4",letterSpacing:"0.01em",fontWeight:"500"}],"label-md":["12.5px",{lineHeight:"1.4",letterSpacing:"0.01em",fontWeight:"500"}],"label-sm":["11px",{lineHeight:"1.4",letterSpacing:"0.08em",fontWeight:"600"}]}}}};</script></head>
+
+<body class="bg-surface font-sans text-on-surface antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/70">
+
+  <input type="checkbox" id="mobile-nav" class="peer sr-only"/>
+
+  <div class="hidden md:block bg-primary-container text-primary-fixed">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-9 flex items-center justify-between">
+      <p class="font-label-sm text-label-sm text-primary-fixed-dim normal-case tracking-normal truncate">
+        Complimentary on-site consultations available for the Spring/Summer season.
+      </p>
+      <div class="flex items-center gap-5 font-label-sm text-label-sm shrink-0">
+        <a href="tel:+18004829130" class="text-primary-fixed hover:text-white transition-colors">+1 (800) 482-9130</a>
+        <span class="w-px h-3 bg-on-primary-container/30"></span>
+        <a href="#" data-path="client-portal" class="text-primary-fixed hover:text-white transition-colors">Client Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+
+    <a href="#" data-path="home" class="flex flex-col leading-none shrink-0">
+      <span class="font-display text-[19px] text-primary tracking-tight">Verdant</span>
+      <span class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-secondary mt-1">Outdoor Living</span>
+    </a>
+
+    <nav class="hidden lg:flex items-center gap-0.5" aria-label="Primary">
+      <a href="#" data-path="home" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Home</a>
+      <a href="#" data-path="services" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Services</a>
+      <a href="#" data-path="projects-portfolio" aria-current="page" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg text-primary bg-surface-container transition-colors">Projects</a>
+      <a href="#" data-path="our-process-story" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Our Process</a>
+      <a href="#" data-path="contact-estimates" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href="tel:+18004829130" class="hidden xl:inline-flex items-center gap-2 px-3 py-2 rounded-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-[17px] leading-none text-secondary">call</span>
+        <span>+1 (800) 482-9130</span>
+      </a>
+      <a href="#" data-path="contact-estimates" class="hidden sm:inline-flex items-center h-9 px-4 rounded-md bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors">
+        Request Estimate
+      </a>
+
+      <label for="mobile-nav" class="lg:hidden peer-checked:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 rounded-md text-primary hover:bg-surface-container transition-colors cursor-pointer" aria-label="Open menu">
+        <span class="material-symbols-outlined text-[22px] leading-none">menu</span>
+      </label>
+      <label for="mobile-nav" class="hidden peer-checked:inline-flex lg:peer-checked:hidden items-center justify-center w-10 h-10 -mr-2 rounded-md text-primary hover:bg-surface-container transition-colors cursor-pointer" aria-label="Close menu">
+        <span class="material-symbols-outlined text-[22px] leading-none">close</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="mobile-nav-panel lg:hidden bg-surface border-t border-outline-variant/70">
+    <nav class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex flex-col" aria-label="Mobile">
+      <a href="#" data-path="home" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Home</a>
+      <a href="#" data-path="services" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Services</a>
+      <a href="#" data-path="projects-portfolio" aria-current="page" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-primary bg-surface-container">Projects &amp; Portfolio</a>
+      <a href="#" data-path="our-process-story" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Our Process &amp; Story</a>
+      <a href="#" data-path="contact-estimates" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Contact &amp; Estimates</a>
+      <div class="mt-3 pt-4 border-t border-outline-variant/70 flex flex-col gap-2">
+        <a href="tel:+18004829130" class="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-md border border-outline-variant text-primary font-label-md text-label-md hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-[17px] leading-none text-secondary">call</span>
+          <span>+1 (800) 482-9130</span>
+        </a>
+        <a href="#" data-path="contact-estimates" class="inline-flex items-center justify-center h-10 px-4 rounded-md bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors">
+          Request Estimate
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+<main class="w-full pt-16 md:pt-[100px] bg-surface"><div class="flex flex-col w-full">
+
+<!-- SECTION 1 · EDITORIAL HEADER + FILTERS -->
+<section class="relative w-full bg-surface pt-12 sm:pt-16 md:pt-20 pb-10 md:pb-12 border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+    <div class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 items-end mb-10 md:mb-12">
+      <div class="lg:col-span-8">
+        <h1 class="font-display text-[34px] sm:text-[42px] md:text-[48px] lg:text-display-lg text-primary tracking-tight leading-[1.1] md:leading-[1.08]">
+          Portfolios of <span class="italic font-normal text-secondary">living architecture</span>.
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed mt-5">
+          Explore our curated catalog of private residential sanctuaries, outdoor pavilions, engineered earthworks, and reclaimed wild gardens crafted in rhythmic harmony with the regional geology.
+        </p>
+      </div>
+
+      <div class="lg:col-span-4 bg-surface-container-low border border-outline-variant/70 rounded-xl p-5">
+        <div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">
+          <span>Verified Inventory</span>
+          <span class="material-symbols-outlined text-secondary text-[16px] leading-none">verified</span>
+        </div>
+        <div class="flex items-baseline gap-3 mt-3">
+          <span class="font-display text-[28px] text-primary font-medium leading-none tracking-tight">142</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant">acres restored under master stewardship</span>
+        </div>
+        <div class="w-full bg-surface-container-highest rounded-full h-1 overflow-hidden mt-4">
+          <div class="bg-primary h-full rounded-full" style="width: 86%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="reveal flex flex-wrap items-center gap-2 overflow-x-auto pb-1" id="portfolio-filter-group" data-delay="1">
+      <button class="filter-tab active-tab inline-flex items-center h-8 px-3.5 rounded-full bg-primary text-on-primary font-label-md text-label-md transition-colors" data-filter="all" type="button">
+        All Works (24)
+      </button>
+      <button class="filter-tab inline-flex items-center h-8 px-3.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors" data-filter="courtyards" type="button">
+        Modern Courtyards
+      </button>
+      <button class="filter-tab inline-flex items-center h-8 px-3.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors" data-filter="hardscape" type="button">
+        Stone Patios &amp; Hardscape
+      </button>
+      <button class="filter-tab inline-flex items-center h-8 px-3.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors" data-filter="estates" type="button">
+        Estate Grounds
+      </button>
+      <button class="filter-tab inline-flex items-center h-8 px-3.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors" data-filter="water-night" type="button">
+        Water &amp; Night Scapes
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 2 · BEFORE / AFTER TRANSFORMATIONS -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface-container-low border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
+
+    <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-secondary">Terrain Evolutions</span>
+        <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-primary mt-3">
+          Interactive spatial transformations.
+        </h2>
+      </div>
+      <p class="font-body-md text-body-md text-on-surface-variant max-w-md md:pb-1.5">
+        Drag the interactive focal slider to reveal the structural engineering and horticultural orchestration beneath each finished residential sanctuary.
+      </p>
+    </div>
+
+    <!-- Case Study 01 -->
+    <div class="reveal bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12" data-delay="1">
+
+      <div class="lg:col-span-7 relative h-[380px] sm:h-[440px] md:h-[520px] select-none overflow-hidden bg-surface-container group cursor-ew-resize" id="slider-container-1">
+        <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('https://picsum.photos/seed/verdant-after-01/1600/1000');"></div>
+        <span class="absolute top-4 right-4 z-20 inline-flex items-center h-7 px-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-[0.08em] shadow-sm">
+          After
+        </span>
+
+        <div class="absolute inset-0 h-full overflow-hidden z-10" id="clip-layer-1" style="width: 50%;">
+          <div class="w-full h-full bg-cover bg-center" style="width: 100%; min-width: 100%; background-image: url('https://picsum.photos/seed/verdant-before-01/1600/1000');"></div>
+          <span class="absolute top-4 left-4 z-20 inline-flex items-center h-7 px-3 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm uppercase tracking-[0.08em] shadow-sm">
+            Before
+          </span>
+        </div>
+
+        <div class="absolute top-0 bottom-0 z-30 pointer-events-none flex items-center justify-center -ml-5" id="slider-handle-1" style="left: 50%;">
+          <div class="w-0.5 h-full bg-surface-container-lowest shadow-[0_0_10px_rgba(0,0,0,0.3)]"></div>
+          <div class="slider-handle-knob absolute w-10 h-10 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center cursor-ew-resize pointer-events-auto hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[18px] leading-none">unfold_more</span>
+          </div>
+        </div>
+
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-on-surface font-label-sm text-label-sm shadow-sm pointer-events-none">
+          ← Drag to reveal →
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 p-6 lg:p-8 flex flex-col justify-between gap-6">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-wrap items-center gap-2.5 font-label-sm text-label-sm uppercase tracking-[0.1em] text-secondary">
+            <span>Case Study 01 · Highland Slope</span>
+            <span class="w-1 h-1 rounded-full bg-secondary/60"></span>
+            <span class="text-on-surface-variant">Aug 2023</span>
+          </div>
+          <h3 class="font-display font-headline-md text-headline-md md:text-headline-lg text-primary tracking-tight">
+            The Oakridge Meadow Transformation
+          </h3>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Faced with severe topsoil loss on an unstable 32-degree decline, our team engineered an interlocking bluestone retaining terrace system with built-in sub-surface drainage, converting an unusable hillside into a tranquil entertainment sanctuary.
+          </p>
+
+          <div class="flex flex-col gap-3 pt-2">
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/60">
+              <span class="material-symbols-outlined text-error mt-0.5 text-[18px] leading-none">close</span>
+              <div>
+                <h4 class="font-label-md text-label-md font-semibold text-on-surface">Existing Liabilities</h4>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Overgrown slope with eroded turf, failing timber ties, and storm runoff threatening lower foundations.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/60">
+              <span class="material-symbols-outlined text-secondary mt-0.5 text-[18px] leading-none">check</span>
+              <div>
+                <h4 class="font-label-md text-label-md font-semibold text-on-surface">Implemented Interventions</h4>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Engineered 3-tier bluestone terraces, drought-hardy native perennials, western red cedar shade structure, and 2700K brass illumination.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant/60 text-center">
+          <div>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">Duration</span>
+            <span class="block font-headline-sm text-headline-sm text-primary mt-1.5">6 Weeks</span>
+          </div>
+          <div class="border-x border-outline-variant/60">
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">Hardscape</span>
+            <span class="block font-headline-sm text-headline-sm text-primary mt-1.5">PA Bluestone</span>
+          </div>
+          <div>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">Aesthetic</span>
+            <span class="block font-headline-sm text-headline-sm text-primary mt-1.5">Pacific Modern</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Case Study 02 -->
+    <div class="reveal bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12" data-delay="1">
+
+      <div class="lg:col-span-5 p-6 lg:p-8 flex flex-col justify-between gap-6 order-2 lg:order-1">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-wrap items-center gap-2.5 font-label-sm text-label-sm uppercase tracking-[0.1em] text-secondary">
+            <span>Case Study 02 · Coastal Enclave</span>
+            <span class="w-1 h-1 rounded-full bg-secondary/60"></span>
+            <span class="text-on-surface-variant">May 2024</span>
+          </div>
+          <h3 class="font-display font-headline-md text-headline-md md:text-headline-lg text-primary tracking-tight">
+            Bayshore Coastal Sanctuary
+          </h3>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Transitioning a sterile, saline-degraded sub-grade parcel into an ultra-modern sunken outdoor salon centered around an in-ground architectural hearth and salt-tolerant botanical architecture.
+          </p>
+
+          <div class="flex flex-col gap-3 pt-2">
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/60">
+              <span class="material-symbols-outlined text-error mt-0.5 text-[18px] leading-none">close</span>
+              <div>
+                <h4 class="font-label-md text-label-md font-semibold text-on-surface">Existing Liabilities</h4>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">High water table, stagnant pooling, saline wind exposure, and compacted alkaline clay soils.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/60">
+              <span class="material-symbols-outlined text-secondary mt-0.5 text-[18px] leading-none">check</span>
+              <div>
+                <h4 class="font-label-md text-label-md font-semibold text-on-surface">Implemented Interventions</h4>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">French-drain sub-base, zero-infill pet-safe luxury synthetic turf, sunken board-formed concrete lounge, and mature Mediterranean olive trees.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant/60 text-center">
+          <div>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">Duration</span>
+            <span class="block font-headline-sm text-headline-sm text-primary mt-1.5">8.5 Weeks</span>
+          </div>
+          <div class="border-x border-outline-variant/60">
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">Canopy</span>
+            <span class="block font-headline-sm text-headline-sm text-primary mt-1.5">Old Olives</span>
+          </div>
+          <div>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">Aesthetic</span>
+            <span class="block font-headline-sm text-headline-sm text-primary mt-1.5">Minimal Coastal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 relative h-[380px] sm:h-[440px] md:h-[520px] select-none overflow-hidden bg-surface-container group cursor-ew-resize order-1 lg:order-2" id="slider-container-2">
+        <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('https://picsum.photos/seed/verdant-after-02/1600/1000');"></div>
+        <span class="absolute top-4 right-4 z-20 inline-flex items-center h-7 px-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-[0.08em] shadow-sm">
+          After
+        </span>
+
+        <div class="absolute inset-0 h-full overflow-hidden z-10" id="clip-layer-2" style="width: 50%;">
+          <div class="w-full h-full bg-cover bg-center" style="width: 100%; min-width: 100%; background-image: url('https://picsum.photos/seed/verdant-before-02/1600/1000');"></div>
+          <span class="absolute top-4 left-4 z-20 inline-flex items-center h-7 px-3 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm uppercase tracking-[0.08em] shadow-sm">
+            Before
+          </span>
+        </div>
+
+        <div class="absolute top-0 bottom-0 z-30 pointer-events-none flex items-center justify-center -ml-5" id="slider-handle-2" style="left: 50%;">
+          <div class="w-0.5 h-full bg-surface-container-lowest shadow-[0_0_10px_rgba(0,0,0,0.3)]"></div>
+          <div class="slider-handle-knob absolute w-10 h-10 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center cursor-ew-resize pointer-events-auto hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[18px] leading-none">unfold_more</span>
+          </div>
+        </div>
+
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-on-surface font-label-sm text-label-sm shadow-sm pointer-events-none">
+          ← Drag to reveal →
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 3 · EDITORIAL GALLERY -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex flex-col gap-10 md:gap-12">
+
+    <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="max-w-xl">
+        <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-secondary">Curated Plates</span>
+        <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-primary mt-3">
+          Visual gallery of architecture &amp; flora.
+        </h2>
+      </div>
+      <div class="flex flex-wrap items-center gap-5 font-body-sm text-body-sm text-on-surface-variant md:pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+          <span>Completed Private Commissions</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+          <span>Specimen Botanical Curation</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start" id="gallery-cards-root">
+
+      <!-- Plate 01 · Estate (7 cols) -->
+      <article class="gallery-card reveal card-interactive md:col-span-7 group bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden" data-category="estates" data-delay="1">
+        <div class="relative overflow-hidden aspect-[16/10] border-b border-outline-variant/60">
+          <img class="w-full h-full object-cover" alt="Grand classical estate grounds with tiered sculpted hedges and crushed stone pathways." src="https://picsum.photos/seed/verdant-gallery-01/1200/750"/>
+          <span class="absolute top-4 left-4 inline-flex items-center h-7 px-2.5 rounded bg-surface/90 backdrop-blur text-primary font-label-sm text-label-sm font-semibold tracking-[0.08em] uppercase">
+            Plate 01 · Estate
+          </span>
+        </div>
+        <div class="p-6 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 font-label-sm text-label-sm uppercase tracking-[0.08em] text-on-surface-variant">
+            <span>Lake Forest, IL</span>
+            <span>4.2 Acres</span>
+          </div>
+          <h3 class="font-display font-headline-md text-headline-md text-primary group-hover:text-secondary transition-colors">
+            The Meadowbrook Conservatory Grounds
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Curated layered shrubbery matrices flanking meandering crushed stone walkways, anchored by a historic restored iron armillary and structured hornbeam hedges.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">European Hornbeam</span>
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Limestone Gravel</span>
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">English Yew</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plate 02 · Hardscape (5 cols) -->
+      <article class="gallery-card reveal card-interactive md:col-span-5 group bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden" data-category="hardscape" data-delay="2">
+        <div class="relative overflow-hidden aspect-[16/10] border-b border-outline-variant/60">
+          <img class="w-full h-full object-cover" alt="Sunken outdoor living room with limestone blocks and rectilinear fire feature." src="https://picsum.photos/seed/verdant-gallery-02/1200/750"/>
+          <span class="absolute top-4 left-4 inline-flex items-center h-7 px-2.5 rounded bg-surface/90 backdrop-blur text-primary font-label-sm text-label-sm font-semibold tracking-[0.08em] uppercase">
+            Plate 02 · Hardscape
+          </span>
+        </div>
+        <div class="p-6 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 font-label-sm text-label-sm uppercase tracking-[0.08em] text-on-surface-variant">
+            <span>High Point Ridge</span>
+            <span>Indiana Limestone</span>
+          </div>
+          <h3 class="font-display font-headline-md text-headline-md text-primary group-hover:text-secondary transition-colors">
+            Sunken Limestone Hearth at High Point
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Recessed architectural fire salon framed with dry-stacked limestone, integrated radiant seating ledges, and concealed linear drainage systems.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Gas Fire Architecture</span>
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Subterranean Drainage</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plate 03 · Water (4 cols) -->
+      <article class="gallery-card reveal card-interactive md:col-span-4 group bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden" data-category="water-night" data-delay="1">
+        <div class="relative overflow-hidden aspect-[16/10] border-b border-outline-variant/60">
+          <img class="w-full h-full object-cover" alt="Minimalist architectural mirror reflection pool with basalt coping." src="https://picsum.photos/seed/verdant-gallery-03/1000/625"/>
+          <span class="absolute top-4 left-4 inline-flex items-center h-7 px-2.5 rounded bg-surface/90 backdrop-blur text-primary font-label-sm text-label-sm font-semibold tracking-[0.08em] uppercase">
+            Plate 03 · Water
+          </span>
+        </div>
+        <div class="p-6 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 font-label-sm text-label-sm uppercase tracking-[0.08em] text-on-surface-variant">
+            <span>West Lake</span>
+            <span>1,800 Gal</span>
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">
+            West Lake Water Garden
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Subtle recirculating mirror reflection pond lined with honed dark basalt coping and architectural wetland botany.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Basalt Coping</span>
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Acoustic Waterfall</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plate 04 · Courtyard (4 cols) -->
+      <article class="gallery-card reveal card-interactive md:col-span-4 group bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden" data-category="courtyards" data-delay="2">
+        <div class="relative overflow-hidden aspect-[16/10] border-b border-outline-variant/60">
+          <img class="w-full h-full object-cover" alt="Weathered bluestone stepping stone pathway through Japanese maples and mossy boulders." src="https://picsum.photos/seed/verdant-gallery-04/1000/625"/>
+          <span class="absolute top-4 left-4 inline-flex items-center h-7 px-2.5 rounded bg-surface/90 backdrop-blur text-primary font-label-sm text-label-sm font-semibold tracking-[0.08em] uppercase">
+            Plate 04 · Courtyard
+          </span>
+        </div>
+        <div class="p-6 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 font-label-sm text-label-sm uppercase tracking-[0.08em] text-on-surface-variant">
+            <span>Highland Crest</span>
+            <span>14 Maples</span>
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">
+            The Hillside Woodland Retreat
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Uncut flagstone trails woven through Japanese bloodgood maples and mossy glacial erratics to produce quiet contemplation corridors.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Acer Palmatum</span>
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Irish Moss</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plate 05 · Putting green (4 cols) -->
+      <article class="gallery-card reveal card-interactive md:col-span-4 group bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden" data-category="hardscape" data-delay="3">
+        <div class="relative overflow-hidden aspect-[16/10] border-b border-outline-variant/60">
+          <img class="w-full h-full object-cover" alt="Championship-grade private putting green with terraced patio and granite boulders." src="https://picsum.photos/seed/verdant-gallery-05/1000/625"/>
+          <span class="absolute top-4 left-4 inline-flex items-center h-7 px-2.5 rounded bg-surface/90 backdrop-blur text-primary font-label-sm text-label-sm font-semibold tracking-[0.08em] uppercase">
+            Plate 05 · Green Suite
+          </span>
+        </div>
+        <div class="p-6 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 font-label-sm text-label-sm uppercase tracking-[0.08em] text-on-surface-variant">
+            <span>Meadowbrook</span>
+            <span>Stimp 11.2</span>
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">
+            Terrace &amp; Putting Green Suite
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Tournament-speed synthetic practice green framed by sculptural dwarf conifers, granite boulders, and concealed perimeter cups.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Pro-Turf Matrix</span>
+            <span class="inline-flex items-center h-6 px-2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Basalt Boulders</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plate 06 · Night panorama (12 cols) -->
+      <article class="gallery-card reveal card-interactive md:col-span-12 group bg-surface-container-lowest border border-outline-variant/70 rounded-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12" data-category="water-night" data-delay="1">
+        <div class="lg:col-span-8 relative overflow-hidden aspect-[16/10] lg:aspect-auto lg:min-h-[360px] border-b lg:border-b-0 lg:border-r border-outline-variant/60">
+          <img class="w-full h-full object-cover" alt="Evening architectural garden illuminated with warm brass uplights through birch groves." src="https://picsum.photos/seed/verdant-gallery-06/1600/1000"/>
+          <span class="absolute top-4 left-4 inline-flex items-center h-7 px-2.5 rounded bg-surface/90 backdrop-blur text-primary font-label-sm text-label-sm font-semibold tracking-[0.08em] uppercase">
+            Plate 06 · Night
+          </span>
+        </div>
+        <div class="lg:col-span-4 p-6 lg:p-8 flex flex-col justify-between gap-5">
+          <div class="flex flex-col gap-3">
+            <span class="font-label-sm text-label-sm uppercase tracking-[0.12em] text-secondary">Atmospheric Illumination</span>
+            <h3 class="font-display font-headline-md text-headline-md text-primary group-hover:text-secondary transition-colors">
+              Evening Luminescence at Briarwood
+            </h3>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Strategic astronomical-timed 2700K brass uplighting illuminating a mature grove of paper birch trees. Concealed fixtures celebrate textural bark textures without skyward light pollution.
+            </p>
+          </div>
+          <div class="flex flex-col gap-2.5 pt-4 border-t border-outline-variant/60">
+            <div class="flex items-center justify-between font-label-sm text-label-sm">
+              <span class="text-on-surface-variant">Color Temperature</span>
+              <span class="text-primary font-semibold">2700K Museum Grade</span>
+            </div>
+            <div class="flex items-center justify-between font-label-sm text-label-sm">
+              <span class="text-on-surface-variant">Fixture Material</span>
+              <span class="text-primary font-semibold">Cast Brass</span>
+            </div>
+            <div class="flex items-center justify-between font-label-sm text-label-sm">
+              <span class="text-on-surface-variant">Automation</span>
+              <span class="text-primary font-semibold">Astronomical Clock</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 4 · MATERIAL PALETTE -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface-container-low border-y border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex flex-col gap-10 md:gap-12">
+
+    <div class="reveal max-w-2xl">
+      <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-secondary">Taxonomy of Materials</span>
+      <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-primary mt-3">
+        Master material &amp; botanical selections.
+      </h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+        Enduring landscapes begin with honest, unadorned materials. Every plate in our archive utilizes locally sourced minerals, timber varieties chosen for weathering grace, and resilient specimen flora.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-5 flex flex-col" data-delay="1">
+        <div class="aspect-[16/11] rounded-lg overflow-hidden bg-surface-container mb-5">
+          <img class="w-full h-full object-cover" alt="Macro texture of Pennsylvania bluestone slate." src="https://picsum.photos/seed/verdant-material-01/800/550"/>
+        </div>
+        <div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-[0.1em]">
+          <span class="text-secondary">Hardscape</span>
+          <span class="text-on-surface-variant">ASTM C616</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary mt-3">Pennsylvania Bluestone</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed flex-1">
+          Thermal-finish non-slip pavers and dry-stack wall caps, selected for subtle slate hues and extreme freeze-thaw endurance.
+        </p>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between font-label-sm text-label-sm">
+          <span class="text-on-surface-variant">Thickness</span>
+          <span class="text-primary font-semibold">2.0″ calibrated</span>
+        </div>
+      </div>
+
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-5 flex flex-col" data-delay="2">
+        <div class="aspect-[16/11] rounded-lg overflow-hidden bg-surface-container mb-5">
+          <img class="w-full h-full object-cover" alt="Macro grain of Western Red Cedar timber." src="https://picsum.photos/seed/verdant-material-02/800/550"/>
+        </div>
+        <div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-[0.1em]">
+          <span class="text-secondary">Timber</span>
+          <span class="text-on-surface-variant">FSC Grade A</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary mt-3">Western Red Cedar</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed flex-1">
+          Architectural grade heartwood timber for pergolas, privacy screens, and banquette benches. Weathers naturally to a refined silver patina.
+        </p>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between font-label-sm text-label-sm">
+          <span class="text-on-surface-variant">Resistance</span>
+          <span class="text-primary font-semibold">Rot &amp; Insect Proof</span>
+        </div>
+      </div>
+
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-5 flex flex-col" data-delay="3">
+        <div class="aspect-[16/11] rounded-lg overflow-hidden bg-surface-container mb-5">
+          <img class="w-full h-full object-cover" alt="Corten steel oxidized patina on architectural planter surface." src="https://picsum.photos/seed/verdant-material-03/800/550"/>
+        </div>
+        <div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-[0.1em]">
+          <span class="text-secondary">Metal</span>
+          <span class="text-on-surface-variant">A588</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary mt-3">Corten Steel Planters</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed flex-1">
+          Precision fabricated custom raised planter beds and retaining edging. Produces a stable, protective velvet oxide crust against moisture.
+        </p>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between font-label-sm text-label-sm">
+          <span class="text-on-surface-variant">Gauge</span>
+          <span class="text-primary font-semibold">3/16″ Plate</span>
+        </div>
+      </div>
+
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-5 flex flex-col" data-delay="4">
+        <div class="aspect-[16/11] rounded-lg overflow-hidden bg-surface-container mb-5">
+          <img class="w-full h-full object-cover" alt="Ancient Mediterranean olive tree with silvery-green leaves and gnarled trunk." src="https://picsum.photos/seed/verdant-material-04/800/550"/>
+        </div>
+        <div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-[0.1em]">
+          <span class="text-secondary">Flora</span>
+          <span class="text-on-surface-variant">Caliper 18″+</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary mt-3">Mission Olive Trees</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed flex-1">
+          Multi-trunked ancient olive specimens imported and acclimated for courtyard centerpieces. High drought tolerance with evergreen canopy.
+        </p>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between font-label-sm text-label-sm">
+          <span class="text-on-surface-variant">Water</span>
+          <span class="text-primary font-semibold">Extremely Low</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 5 · CTA -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+    <div class="reveal relative bg-primary-container rounded-xl md:rounded-2xl px-6 py-12 sm:px-10 sm:py-14 md:px-14 md:py-16 overflow-hidden">
+      <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7">
+          <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-primary-fixed-dim">Reserve Project Studio Slot</span>
+          <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-surface-container-lowest mt-3">
+            Envisioning a similar transformation for your property?
+          </h2>
+          <p class="font-body-md text-body-md text-primary-fixed-dim mt-5 leading-relaxed max-w-xl">
+            Our principal landscape architects accept a select allocation of 12 full-estate commissions each calendar year. Schedule a confidential on-site diagnostic appraisal and portfolio review today.
+          </p>
+          <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-label-md text-label-md text-primary-fixed">
+            <span class="inline-flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px] leading-none text-secondary-fixed">domain</span>
+              <span>Licensed Landscape Architects</span>
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px] leading-none text-secondary-fixed">engineering</span>
+              <span>In-House Grading &amp; Hardscape Teams</span>
+            </span>
+          </div>
+        </div>
+        <div class="lg:col-span-5 flex flex-col gap-3">
+          <a href="#" data-path="contact-estimates" class="group inline-flex items-center justify-center gap-2.5 h-12 px-5 rounded-md bg-surface-container-lowest text-primary font-label-lg text-label-lg font-semibold hover:bg-surface-container-low transition-colors">
+            <span>Schedule a Private Portfolio Review</span>
+            <span class="material-symbols-outlined text-[18px] leading-none transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+          </a>
+          <div class="p-4 rounded-lg bg-primary/40 border border-primary-fixed-dim/10">
+            <div class="flex items-center justify-between font-label-sm text-label-sm text-primary-fixed">
+              <span>Direct Studio Concierge</span>
+              <a href="tel:+18004829130" class="font-semibold text-surface-container-lowest hover:text-secondary-fixed transition-colors">+1 (800) 482-9130</a>
+            </div>
+            <p class="font-body-sm text-body-sm text-primary-fixed-dim mt-2 leading-relaxed">
+              Complimentary 45-minute on-site feasibility evaluation for properties exceeding 0.5 acres.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div></main>
+
+
+<!-- FOOTER -->
+<footer class="w-full bg-primary-container text-on-primary-container border-t border-primary/40">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-12 md:py-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8">
+
+      <div class="sm:col-span-2 lg:col-span-4 flex flex-col">
+        <span class="font-display text-[22px] text-surface-container-lowest tracking-tight">Verdant</span>
+        <p class="font-body-sm text-body-sm text-primary-fixed-dim leading-relaxed mt-3 max-w-xs">
+          Crafting enduring landscapes where architecture and living nature coexist in balance.
+        </p>
+        <div class="mt-5 inline-flex items-center gap-2 self-start px-2.5 py-1 rounded bg-primary/50 font-label-sm text-label-sm uppercase tracking-[0.08em] text-primary-fixed">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+          <span>Falalu Creative Studio</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-3 flex flex-col">
+        <h4 class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-surface-container-lowest mb-4">Services</h4>
+        <ul class="flex flex-col gap-2.5 font-body-sm text-body-sm text-primary-fixed-dim">
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Master Landscape Planning</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Artisan Stone Patios</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Architectural Irrigation</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Specimen Tree Care</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Custom Water Elements</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Luxury Turf Installations</a></li>
+        </ul>
+      </div>
+
+      <div class="lg:col-span-2 flex flex-col">
+        <h4 class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-surface-container-lowest mb-4">Areas</h4>
+        <ul class="flex flex-col gap-2.5 font-body-sm text-body-sm text-primary-fixed-dim">
+          <li>North Shore</li>
+          <li>West Lake Estates</li>
+          <li>Highland Park</li>
+          <li>Meadowbrook</li>
+          <li>River Oaks</li>
+          <li>Piedmont Enclave</li>
+        </ul>
+      </div>
+
+      <div class="lg:col-span-3 flex flex-col">
+        <h4 class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-surface-container-lowest mb-4">Studio</h4>
+        <p class="font-body-sm text-body-sm text-primary-fixed-dim leading-relaxed">742 Botanical Way, Suite 400<br/>Architecture Row, Design District</p>
+        <p class="mt-3 font-body-sm text-body-sm text-primary-fixed-dim leading-relaxed">
+          <span class="text-surface-container-lowest font-medium">Hours</span> · Mon–Fri 8:00–18:00<br/>Sat by appointment
+        </p>
+        <a href="#" data-path="contact-estimates" class="group mt-4 inline-flex items-center gap-1.5 font-label-md text-label-md text-primary-fixed hover:text-surface-container-lowest transition-colors">
+          <span>Schedule a studio consultation</span>
+          <span class="material-symbols-outlined text-[16px] leading-none transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-10 md:mt-14 pt-6 border-t border-primary/40 flex flex-col md:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-primary-fixed-dim/70">
+      <p>© 2025 Verdant Outdoor Living. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-label-sm text-label-sm">
+        <a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="privacy-terms">Privacy</a>
+        <a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="privacy-terms">Terms</a>
+        <a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="accessibility">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- SCRIPT · REVEAL + SLIDERS + GALLERY FILTER -->
+<script>
+(function () {
+  'use strict';
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 1. SCROLL REVEAL */
+  const revealTargets = document.querySelectorAll('.reveal');
+
+  if (prefersReducedMotion) {
+    revealTargets.forEach(el => el.classList.add('is-visible'));
+  } else if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    revealTargets.forEach(el => observer.observe(el));
+  } else {
+    revealTargets.forEach(el => el.classList.add('is-visible'));
+  }
+
+  /* 2. BEFORE / AFTER SLIDER */
+  function setupSlider(containerId, clipId, handleId) {
+    const container = document.getElementById(containerId);
+    const clip = document.getElementById(clipId);
+    const handle = document.getElementById(handleId);
+    if (!container || !clip || !handle) return;
+
+    let isDown = false;
+
+    function updatePosition(clientX) {
+      const rect = container.getBoundingClientRect();
+      let offsetX = clientX - rect.left;
+      if (offsetX < 0) offsetX = 0;
+      if (offsetX > rect.width) offsetX = rect.width;
+      const percentage = (offsetX / rect.width) * 100;
+      clip.style.width = percentage + '%';
+      handle.style.left = percentage + '%';
+    }
+
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      updatePosition(e.clientX);
+    });
+
+    window.addEventListener('mouseup', () => { isDown = false; });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      updatePosition(e.clientX);
+    });
+
+    container.addEventListener('touchstart', (e) => {
+      isDown = true;
+      if (e.touches[0]) updatePosition(e.touches[0].clientX);
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => { isDown = false; });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      if (e.touches[0]) updatePosition(e.touches[0].clientX);
+    }, { passive: true });
+  }
+
+  setupSlider('slider-container-1', 'clip-layer-1', 'slider-handle-1');
+  setupSlider('slider-container-2', 'clip-layer-2', 'slider-handle-2');
+
+  /* 3. GALLERY FILTER WITH ANIMATION */
+  const filterTabs = document.querySelectorAll('#portfolio-filter-group .filter-tab');
+  const galleryCards = document.querySelectorAll('#gallery-cards-root .gallery-card');
+
+  const activeClasses = ['bg-primary', 'text-on-primary'];
+  const inactiveClasses = ['bg-surface-container', 'text-on-surface-variant', 'hover:bg-surface-container-high'];
+  const HIDE_DURATION = 240;
+
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach(t => {
+        t.classList.remove(...activeClasses);
+        t.classList.add(...inactiveClasses);
+      });
+      tab.classList.add(...activeClasses);
+      tab.classList.remove(...inactiveClasses);
+
+      const filter = tab.getAttribute('data-filter');
+
+      galleryCards.forEach(card => {
+        const category = card.getAttribute('data-category') || '';
+        const shouldShow = filter === 'all' || category === filter || category.includes(filter);
+
+        if (shouldShow) {
+          clearTimeout(card._hideTimer);
+          card.style.display = '';
+          void card.offsetWidth;
+          card.classList.remove('is-filtered-out');
+        } else {
+          card.classList.add('is-filtered-out');
+          clearTimeout(card._hideTimer);
+          card._hideTimer = setTimeout(() => {
+            card.style.display = 'none';
+          }, prefersReducedMotion ? 0 : HIDE_DURATION);
+        }
+      });
+    });
+  });
+
+})();
+</script>
+
+</body></html>

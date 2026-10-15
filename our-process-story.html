@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}*:focus-visible{outline:2px solid #50634f;outline-offset:2px;border-radius:inherit;}::-webkit-scrollbar{display:none;}.material-symbols-outlined{font-variation-settings:'opsz' 24,'wght' 400,'FILL' 0,'GRAD' 0;}}
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATION SYSTEM — shared across all pages
+═══════════════════════════════════════════════════════════ */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms var(--ease-out-expo), transform 600ms var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal[data-delay="1"] { transition-delay: 80ms; }
+.reveal[data-delay="2"] { transition-delay: 160ms; }
+.reveal[data-delay="3"] { transition-delay: 240ms; }
+.reveal[data-delay="4"] { transition-delay: 320ms; }
+
+.card-interactive {
+  transition: border-color 240ms var(--ease-out-quart), transform 300ms var(--ease-out-expo), box-shadow 300ms var(--ease-out-expo), background-color 240ms var(--ease-out-quart);
+}
+.card-interactive:hover { transform: translateY(-2px); box-shadow: 0 6px 20px -8px rgba(5, 27, 18, 0.10); }
+.card-interactive img { transition: transform 700ms var(--ease-out-expo); }
+.card-interactive:hover img { transform: scale(1.03); }
+
+button, a[data-path], a[href^="tel:"] {
+  transition: background-color 200ms var(--ease-out-quart), border-color 200ms var(--ease-out-quart), color 200ms var(--ease-out-quart), transform 120ms var(--ease-out-quart);
+}
+button:active, a[data-path]:active, a[href^="tel:"]:active { transform: scale(0.98); }
+
+.mobile-nav-panel { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 320ms var(--ease-out-expo), opacity 240ms var(--ease-out-quart); }
+#mobile-nav:checked ~ .mobile-nav-panel { max-height: 520px; opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary":"#ffffff","primary-fixed":"#cfe9d9","surface-container-lowest":"#ffffff","on-error-container":"#93000a","inverse-primary":"#b3ccbe","on-error":"#ffffff","on-tertiary-container":"#ca815e","on-secondary-fixed-variant":"#394b38","surface":"#fbf9f5","surface-dim":"#dbdad6","inverse-on-surface":"#f2f0ed","primary-container":"#1a3026","surface-container-low":"#f5f3ef","tertiary-container":"#4d1d03","surface-tint":"#4c6358","on-tertiary-fixed-variant":"#6f371b","on-tertiary-fixed":"#351000","surface-bright":"#fbf9f5","background":"#fbf9f5","on-background":"#1b1c1a","on-surface":"#1b1c1a","outline-variant":"#c2c8c3","surface-container-high":"#eae8e4","inverse-surface":"#30312e","on-surface-variant":"#424844","primary-fixed-dim":"#b3ccbe","error-container":"#ffdad6","surface-variant":"#e4e2de","secondary-fixed":"#d3e8ce","secondary-container":"#d0e6cc","on-primary":"#ffffff","secondary-fixed-dim":"#b7ccb3","on-secondary-container":"#556853","tertiary-fixed":"#ffdbcc","tertiary-fixed-dim":"#ffb694","outline":"#727974","on-primary-fixed-variant":"#354c40","tertiary":"#2e0d00","surface-container-highest":"#e4e2de","on-primary-container":"#80988b","on-tertiary":"#ffffff","on-primary-fixed":"#092016","secondary":"#50634f","error":"#ba1a1a","on-secondary-fixed":"#0e1f0f","primary":"#051b12","surface-container":"#efeeea"},borderRadius:{DEFAULT:"4px",sm:"4px",md:"6px",lg:"8px",xl:"12px","2xl":"16px",full:"9999px"},boxShadow:{xs:"0 1px 2px 0 rgba(5,27,18,0.04)","sm":"0 1px 2px 0 rgba(5,27,18,0.05),0 1px 1px 0 rgba(5,27,18,0.03)","md":"0 2px 4px -1px rgba(5,27,18,0.06),0 2px 2px -1px rgba(5,27,18,0.03)","lg":"0 4px 10px -2px rgba(5,27,18,0.06),0 2px 4px -2px rgba(5,27,18,0.04)"},spacing:{"space-md":"1.25rem",margin:"1.25rem","space-xs":"0.375rem",gutter:"1.5rem","space-lg":"2rem","margin-desktop":"4rem","gutter-desktop":"2.5rem","space-sm":"0.75rem","space-xl":"3.5rem"},fontFamily:{"display":["Playfair Display","Georgia","serif"],"sans":["Plus Jakarta Sans","ui-sans-serif","system-ui","sans-serif"],"headline-lg":["Playfair Display"],"headline-md":["Playfair Display"],"headline-sm":["Plus Jakarta Sans"],"display-lg":["Playfair Display"],"display-lg-mobile":["Playfair Display"],"headline-lg-mobile":["Playfair Display"],"body-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"]},fontSize:{"display-lg":["52px",{lineHeight:"1.08",letterSpacing:"-0.022em",fontWeight:"400"}],"display-lg-mobile":["34px",{lineHeight:"1.12",letterSpacing:"-0.018em",fontWeight:"400"}],"headline-lg":["32px",{lineHeight:"1.2",letterSpacing:"-0.018em",fontWeight:"500"}],"headline-lg-mobile":["26px",{lineHeight:"1.25",letterSpacing:"-0.015em",fontWeight:"500"}],"headline-md":["22px",{lineHeight:"1.3",letterSpacing:"-0.012em",fontWeight:"500"}],"headline-sm":["16px",{lineHeight:"1.4",letterSpacing:"-0.005em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"1.6",fontWeight:"400"}],"body-md":["14.5px",{lineHeight:"1.6",fontWeight:"400"}],"body-sm":["13px",{lineHeight:"1.55",fontWeight:"400"}],"label-lg":["13.5px",{lineHeight:"1.4",letterSpacing:"0.01em",fontWeight:"500"}],"label-md":["12.5px",{lineHeight:"1.4",letterSpacing:"0.01em",fontWeight:"500"}],"label-sm":["11px",{lineHeight:"1.4",letterSpacing:"0.08em",fontWeight:"600"}]}}}};</script></head>
+
+<body class="bg-surface font-sans text-on-surface antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/70">
+
+  <input type="checkbox" id="mobile-nav" class="peer sr-only"/>
+
+  <div class="hidden md:block bg-primary-container text-primary-fixed">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-9 flex items-center justify-between">
+      <p class="font-label-sm text-label-sm text-primary-fixed-dim normal-case tracking-normal truncate">
+        Complimentary on-site consultations available for the Spring/Summer season.
+      </p>
+      <div class="flex items-center gap-5 font-label-sm text-label-sm shrink-0">
+        <a href="tel:+18004829130" class="text-primary-fixed hover:text-white transition-colors">+1 (800) 482-9130</a>
+        <span class="w-px h-3 bg-on-primary-container/30"></span>
+        <a href="#" data-path="client-portal" class="text-primary-fixed hover:text-white transition-colors">Client Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+
+    <a href="#" data-path="home" class="flex flex-col leading-none shrink-0">
+      <span class="font-display text-[19px] text-primary tracking-tight">Verdant</span>
+      <span class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-secondary mt-1">Outdoor Living</span>
+    </a>
+
+    <nav class="hidden lg:flex items-center gap-0.5" aria-label="Primary">
+      <a href="#" data-path="home" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Home</a>
+      <a href="#" data-path="services" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Services</a>
+      <a href="#" data-path="projects-portfolio" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Projects</a>
+      <a href="#" data-path="our-process-story" aria-current="page" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg text-primary bg-surface-container transition-colors">Our Process</a>
+      <a href="#" data-path="contact-estimates" class="px-3.5 py-2 rounded-md font-label-lg text-label-lg font-normal text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href="tel:+18004829130" class="hidden xl:inline-flex items-center gap-2 px-3 py-2 rounded-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-[17px] leading-none text-secondary">call</span>
+        <span>+1 (800) 482-9130</span>
+      </a>
+      <a href="#" data-path="contact-estimates" class="hidden sm:inline-flex items-center h-9 px-4 rounded-md bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors">
+        Request Estimate
+      </a>
+
+      <label for="mobile-nav" class="lg:hidden peer-checked:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 rounded-md text-primary hover:bg-surface-container transition-colors cursor-pointer" aria-label="Open menu">
+        <span class="material-symbols-outlined text-[22px] leading-none">menu</span>
+      </label>
+      <label for="mobile-nav" class="hidden peer-checked:inline-flex lg:peer-checked:hidden items-center justify-center w-10 h-10 -mr-2 rounded-md text-primary hover:bg-surface-container transition-colors cursor-pointer" aria-label="Close menu">
+        <span class="material-symbols-outlined text-[22px] leading-none">close</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="mobile-nav-panel lg:hidden bg-surface border-t border-outline-variant/70">
+    <nav class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex flex-col" aria-label="Mobile">
+      <a href="#" data-path="home" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Home</a>
+      <a href="#" data-path="services" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Services</a>
+      <a href="#" data-path="projects-portfolio" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Projects &amp; Portfolio</a>
+      <a href="#" data-path="our-process-story" aria-current="page" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-primary bg-surface-container">Our Process &amp; Story</a>
+      <a href="#" data-path="contact-estimates" class="px-3 py-3 rounded-md font-label-lg text-label-lg text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors">Contact &amp; Estimates</a>
+      <div class="mt-3 pt-4 border-t border-outline-variant/70 flex flex-col gap-2">
+        <a href="tel:+18004829130" class="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-md border border-outline-variant text-primary font-label-md text-label-md hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-[17px] leading-none text-secondary">call</span>
+          <span>+1 (800) 482-9130</span>
+        </a>
+        <a href="#" data-path="contact-estimates" class="inline-flex items-center justify-center h-10 px-4 rounded-md bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors">
+          Request Estimate
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+<main class="w-full pt-16 md:pt-[100px] bg-surface"><div class="flex flex-col w-full">
+
+<!-- SECTION 1 · EDITORIAL HEADER -->
+<section class="relative w-full bg-surface pt-14 sm:pt-20 md:pt-24 pb-12 md:pb-16 border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+    <div class="max-w-3xl">
+      <h1 class="reveal font-display text-[34px] sm:text-[42px] md:text-[48px] lg:text-display-lg text-primary tracking-tight leading-[1.1] md:leading-[1.08]">
+        Designing for the senses, <span class="italic font-normal text-secondary">grounded</span> in horticulture.
+      </h1>
+      <p class="reveal font-body-lg text-body-lg text-on-surface-variant mt-6 leading-relaxed max-w-2xl" data-delay="1">
+        Founded on the principle that the finest architecture doesn't stop at the exterior wall, Verdant bridges intentional living with biological richness.
+      </p>
+    </div>
+
+    <div class="reveal mt-10 md:mt-14 pt-6 border-t border-outline-variant/70 flex flex-wrap items-center gap-x-8 gap-y-3 font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant" data-delay="2">
+      <span class="inline-flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px] leading-none text-secondary">explore</span>
+        <span>Studio Folio 2025.4</span>
+      </span>
+      <span class="inline-flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px] leading-none text-secondary">eco</span>
+        <span>Native Micro-Climate Calibration</span>
+      </span>
+      <span class="inline-flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px] leading-none text-secondary">verified</span>
+        <span>Master Guild Artisans</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 2 · STUDIO STORY -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface-container-low border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+
+      <!-- Narrative (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-6">
+        <div class="reveal flex items-center gap-4">
+          <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-secondary">Genesis &amp; Conviction</span>
+          <div class="h-px bg-outline-variant/60 flex-1"></div>
+        </div>
+
+        <h2 class="reveal font-display font-headline-lg-mobile md:text-headline-lg text-primary tracking-tight" data-delay="1">
+          Where honed limestone meets deep root biology.
+        </h2>
+
+        <div class="reveal flex flex-col gap-5 font-body-md text-body-md text-on-surface-variant leading-relaxed" data-delay="2">
+          <p>
+            Verdant began with a critical observation across luxury residential developments: estates constructed with surgical architectural precision frequently surrendered their perimeters to generic, uninspired lawns that fought their regional ecology rather than celebrating it.
+          </p>
+          <p>
+            We set out to dismantle the divide between landscape architecture and horticultural science. Every topography we sculpt is anchored in native micro-climates, hydrological intelligence, and the natural patination of bespoke structural stone. We source specimens directly from specialized heritage nurseries, preserving mature canopies while integrating cutting-edge sub-surface aeration systems.
+          </p>
+          <p>
+            The outcome is an outdoor atmosphere that breathes alongside the home — moderating ambient temperatures, fostering native pollinator sanctuaries, and offering an evolving sensory retreat through all four seasons.
+          </p>
+        </div>
+
+        <div class="reveal grid grid-cols-3 gap-3 pt-4" data-delay="3">
+          <div class="border border-outline-variant/70 rounded-lg p-4">
+            <span class="block font-display text-[24px] text-primary leading-none tracking-tight">14+</span>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant mt-2">Years Practiced</span>
+          </div>
+          <div class="border border-outline-variant/70 rounded-lg p-4">
+            <span class="block font-display text-[24px] text-primary leading-none tracking-tight">120+</span>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant mt-2">Private Sanctuaries</span>
+          </div>
+          <div class="border border-outline-variant/70 rounded-lg p-4">
+            <span class="block font-display text-[24px] text-primary leading-none tracking-tight">100%</span>
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant mt-2">Artisan Directed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portrait card (5 cols) -->
+      <div class="reveal lg:col-span-5 lg:sticky lg:top-28" data-delay="1">
+        <div class="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-5 lg:p-6 flex flex-col gap-5">
+          <div class="relative aspect-square rounded-lg overflow-hidden bg-surface-container border border-outline-variant/60 group">
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Portrait of Julian Vance, Studio Principal" src="https://picsum.photos/seed/verdant-principal/900/900"/>
+            <div class="absolute bottom-3 left-3 inline-flex items-center gap-2 bg-surface/95 backdrop-blur-md px-3 py-1.5 rounded-md">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              <span class="font-label-sm text-label-sm text-primary font-semibold tracking-[0.06em] uppercase">Julian Vance · Principal</span>
+            </div>
+          </div>
+
+          <div class="bg-surface-container-low rounded-lg p-5 flex flex-col gap-3">
+            <span class="material-symbols-outlined text-secondary text-[24px] leading-none">format_quote</span>
+            <blockquote class="font-display font-headline-md text-headline-md text-primary italic leading-snug">
+              "A garden is not a static installation; it is an evolving conversation between light, masonry, and living plant material."
+            </blockquote>
+            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.1em] pt-2 border-t border-outline-variant/70">
+              Registered Landscape Architect · RLA, ASLA
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 3 · 3-STEP BLUEPRINT -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+    <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-14">
+      <div class="max-w-2xl">
+        <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-secondary">The Transformation Framework</span>
+        <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-primary mt-3">
+          The 3-step consultation &amp; execution blueprint.
+        </h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+          From initial geotechnical diagnostics to unhurried twilight walks on your finished terrace, each phase is executed with unyielding precision.
+        </p>
+      </div>
+      <div class="hidden md:flex items-center gap-3 md:pb-1.5">
+        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.1em]">Structured Phase Tracking</span>
+        <span class="w-10 h-px bg-outline-variant"></span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+      <!-- Step 01 -->
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 lg:p-7 flex flex-col justify-between relative overflow-hidden" data-delay="1">
+        <div class="absolute -right-2 -top-4 font-display text-[80px] text-primary/[0.04] select-none font-bold leading-none pointer-events-none">01</div>
+        <div class="flex flex-col gap-5 relative">
+          <div class="w-10 h-10 rounded-lg bg-primary-container text-primary-fixed flex items-center justify-center font-label-md text-label-md font-bold">
+            01
+          </div>
+          <div>
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.12em] font-semibold">Stage 1 · 2–3 Weeks</span>
+            <h3 class="font-display font-headline-md text-headline-md text-primary mt-2">
+              Comprehensive Site Survey &amp; Discovery
+            </h3>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            We conduct non-invasive ecological and architectural investigations to build an infallible baseline for your outdoor sanctuary.
+          </p>
+
+          <ul class="flex flex-col gap-3 pt-2">
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">wb_sunny</span>
+              <span><strong class="font-semibold">Sunlight &amp; Shadow:</strong> 365-day solar elevation mapping across terraces, courtyards, and tree lines.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">science</span>
+              <span><strong class="font-semibold">Soil &amp; Hydrology:</strong> Core sample testing for mineral composition, percolation, and subterranean strata.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">nature</span>
+              <span><strong class="font-semibold">Micro-Climate:</strong> Wind funnel isolation, frost pocket diagnostics, and existing flora health evaluation.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">sentiment_satisfied</span>
+              <span><strong class="font-semibold">Lifestyle Interview:</strong> Deep dive into hosting rituals, pet pathways, acoustic isolation, and privacy buffers.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-8 pt-5 border-t border-outline-variant/70 flex items-center justify-between gap-3 font-label-sm text-label-sm">
+          <span class="text-on-surface-variant uppercase tracking-[0.1em]">Site Diagnostic Dossier</span>
+          <span class="material-symbols-outlined text-secondary text-[16px] leading-none">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Step 02 -->
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 lg:p-7 flex flex-col justify-between relative overflow-hidden" data-delay="2">
+        <div class="absolute -right-2 -top-4 font-display text-[80px] text-primary/[0.04] select-none font-bold leading-none pointer-events-none">02</div>
+        <div class="flex flex-col gap-5 relative">
+          <div class="w-10 h-10 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-label-md text-label-md font-bold">
+            02
+          </div>
+          <div>
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.12em] font-semibold">Stage 2 · 3–4 Weeks</span>
+            <h3 class="font-display font-headline-md text-headline-md text-primary mt-2">
+              Concept Architecture &amp; 3D Spatial Modeling
+            </h3>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            We translate diagnostic findings into immersive spatial narratives, matching material tactility with precise engineering.
+          </p>
+
+          <ul class="flex flex-col gap-3 pt-2">
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">view_in_ar</span>
+              <span><strong class="font-semibold">Photorealistic Walkthroughs:</strong> Real-time digital twins presenting illumination, water reflections, and foliage maturity.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">palette</span>
+              <span><strong class="font-semibold">Physical Material Boards:</strong> Direct tactile appraisal of limestone, thermal ash, hammered brass, and river pebble specimens.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">water_drop</span>
+              <span><strong class="font-semibold">Hydrological Design:</strong> Closed-loop water features, permeable grading, and subsurface irrigation runs.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">receipt_long</span>
+              <span><strong class="font-semibold">Fixed-Milestone Plan:</strong> Transparent scheduling, milestone billings, and guaranteed material provenance.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-8 pt-5 border-t border-outline-variant/70 flex items-center justify-between gap-3 font-label-sm text-label-sm">
+          <span class="text-on-surface-variant uppercase tracking-[0.1em]">Master Architectural Blueprint</span>
+          <span class="material-symbols-outlined text-secondary text-[16px] leading-none">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Step 03 -->
+      <div class="reveal card-interactive bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 lg:p-7 flex flex-col justify-between relative overflow-hidden" data-delay="3">
+        <div class="absolute -right-2 -top-4 font-display text-[80px] text-primary/[0.04] select-none font-bold leading-none pointer-events-none">03</div>
+        <div class="flex flex-col gap-5 relative">
+          <div class="w-10 h-10 rounded-lg bg-tertiary text-on-tertiary flex items-center justify-center font-label-md text-label-md font-bold">
+            03
+          </div>
+          <div>
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.12em] font-semibold">Stage 3 · Ground Execution</span>
+            <h3 class="font-display font-headline-md text-headline-md text-primary mt-2">
+              Master Artisan Installation &amp; Handover
+            </h3>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Our guild of specialized stonemasons, certified arborists, and irrigation masters execute each facet with white-glove rigor.
+          </p>
+
+          <ul class="flex flex-col gap-3 pt-2">
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">engineering</span>
+              <span><strong class="font-semibold">Dedicated Master Builder:</strong> Single point-of-contact oversight coordinating masonry, carpentry, and electrical artisans daily.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">potted_plant</span>
+              <span><strong class="font-semibold">Nursery Tagging:</strong> Personal selection of mature specimen trees direct from elite cultivation grounds.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">compost</span>
+              <span><strong class="font-semibold">Soil Inoculation:</strong> Intensive enrichment with organic compost teas to foster root fungal symbiosis.</span>
+            </li>
+            <li class="flex items-start gap-2.5 font-body-sm text-body-sm text-on-surface">
+              <span class="material-symbols-outlined text-secondary text-[18px] leading-none mt-0.5 shrink-0">menu_book</span>
+              <span><strong class="font-semibold">Care Folio:</strong> Smart system automation pairing, seasonal pruning schedule, and 5-year maintenance guide.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-8 pt-5 border-t border-outline-variant/70 flex items-center justify-between gap-3 font-label-sm text-label-sm">
+          <span class="text-on-surface-variant uppercase tracking-[0.1em]">Custom Seasonal Care Folio</span>
+          <span class="material-symbols-outlined text-secondary text-[16px] leading-none">arrow_forward</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 4 · STEWARDSHIP MATRIX -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface-container-low border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+    <div class="reveal max-w-2xl mx-auto text-center mb-10 md:mb-14">
+      <span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-secondary">Immutable Commitments</span>
+      <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-primary mt-3">
+        Standards of practice &amp; environmental stewardship.
+      </h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+        Enduring luxury demands an ethical covenant with the surrounding ecosystem.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="reveal bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 flex flex-col gap-4" data-delay="1">
+        <div class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px] leading-none">water</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary">Water Conservation Architecture</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          Integrated subterranean cisterns, weather-sensing evaporation loops, and deep-drip emitters reduce residential landscape water use by up to 55%.
+        </p>
+      </div>
+
+      <div class="reveal bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 flex flex-col gap-4" data-delay="2">
+        <div class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px] leading-none">forest</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary">Locally Sourced Stone &amp; Timber</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          All masonry blocks, flagging, and hardwoods originate from verified regional quarries and sustainably managed forest reserves within 250 miles.
+        </p>
+      </div>
+
+      <div class="reveal bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 flex flex-col gap-4" data-delay="3">
+        <div class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px] leading-none">pest_control</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary">Pollinator-Safe Integrated Care</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          Strictly neonicotinoid-free pest solutions. We construct companion planting buffers that welcome native bees, hummingbirds, and predatory insects.
+        </p>
+      </div>
+
+      <div class="reveal bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-6 flex flex-col gap-4" data-delay="4">
+        <div class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px] leading-none">verified_user</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-primary">5-Year Structural Masonry Guarantee</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          Dry-stack retaining walls, sub-base gravel prep, and mortar formulations engineered to withstand ground heave — backed by our structural warranty.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 5 · TESTIMONIALS -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface border-b border-outline-variant/60">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+
+    <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
+      <div class="max-w-xl">
+        <div class="inline-flex items-center gap-2 h-7 px-3 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm uppercase tracking-[0.08em]">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          <span>Sample Client Experiences · Concept Demonstration</span>
+        </div>
+        <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-primary mt-4">
+          Reflections from estate custodians.
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm md:pb-1.5 md:text-right">
+        Exemplifying client journeys across our core suburban and waterfront commissions.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+      <div class="reveal bg-surface-container-low border border-outline-variant/70 rounded-xl p-6 flex flex-col justify-between gap-6" data-delay="1">
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-1 text-on-tertiary-container">
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface leading-relaxed italic">
+            "The 3-step blueprint removed all ambiguity. Seeing our outdoor kitchen and reflecting pool in 3D before a single spade touched the earth gave us complete peace of mind. The craftsmanship is flawless."
+          </p>
+        </div>
+        <div class="flex items-center gap-3 pt-5 border-t border-outline-variant/70">
+          <img class="w-11 h-11 rounded-full object-cover border border-outline-variant/60" alt="Portrait of Eleanor Sterling, estate owner." src="https://picsum.photos/seed/verdant-testimonial-01/200/200"/>
+          <div>
+            <h4 class="font-label-lg text-label-lg text-primary font-semibold">Eleanor &amp; Charles Sterling</h4>
+            <p class="font-label-sm text-label-sm text-secondary">West Lake Estates · 2.4-Acre Transformation</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal bg-surface-container-low border border-outline-variant/70 rounded-xl p-6 flex flex-col justify-between gap-6" data-delay="2">
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-1 text-on-tertiary-container">
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface leading-relaxed italic">
+            "Julian and his team understood the complex grade transitions of our cliffside property where other landscapers hesitated. Two years later, our native meadow planting looks richer with every passing month."
+          </p>
+        </div>
+        <div class="flex items-center gap-3 pt-5 border-t border-outline-variant/70">
+          <img class="w-11 h-11 rounded-full object-cover border border-outline-variant/60" alt="Portrait of Dr. Marcus Bradley, estate owner." src="https://picsum.photos/seed/verdant-testimonial-02/200/200"/>
+          <div>
+            <h4 class="font-label-lg text-label-lg text-primary font-semibold">Dr. Marcus Bradley</h4>
+            <p class="font-label-sm text-label-sm text-secondary">Highland Park · Terraced Escarpment &amp; Fire Hearth</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal bg-surface-container-low border border-outline-variant/70 rounded-xl p-6 flex flex-col justify-between gap-6" data-delay="3">
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-1 text-on-tertiary-container">
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+            <span class="material-symbols-outlined text-[14px] leading-none" style="font-variation-settings: 'FILL' 1;">star</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface leading-relaxed italic">
+            "The seasonal care folio handed over at project completion is indispensable. Their artisan team tagged every single specimen at private nurseries. Our courtyard has become the true center of our family life."
+          </p>
+        </div>
+        <div class="flex items-center gap-3 pt-5 border-t border-outline-variant/70">
+          <img class="w-11 h-11 rounded-full object-cover border border-outline-variant/60" alt="Portrait of Vivienne Laurent, estate owner." src="https://picsum.photos/seed/verdant-testimonial-03/200/200"/>
+          <div>
+            <h4 class="font-label-lg text-label-lg text-primary font-semibold">Vivienne Laurent</h4>
+            <p class="font-label-sm text-label-sm text-secondary">Piedmont Enclave · Courtyard &amp; Specimen Grove</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 6 · STUDIO RATIONALE -->
+<section class="w-full py-16 md:py-20 lg:py-24 bg-surface">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+    <div class="reveal relative bg-primary-container border border-primary/40 rounded-xl md:rounded-2xl px-6 py-12 sm:px-10 sm:py-14 md:px-14 md:py-16 overflow-hidden">
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+          <div class="inline-flex items-center gap-2 self-start h-7 px-3 rounded-full bg-primary/50 font-label-sm text-label-sm uppercase tracking-[0.08em] text-primary-fixed">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+            <span>Concept Rationale · Falalu Creative Studio</span>
+          </div>
+
+          <h2 class="font-display font-headline-lg-mobile md:text-headline-lg text-surface-container-lowest tracking-tight">
+            Architected for quiet authority and unhurried conversion.
+          </h2>
+
+          <div class="flex flex-col gap-4 font-body-md text-body-md text-primary-fixed-dim leading-relaxed max-w-3xl">
+            <p>
+              This digital experience was envisioned by <strong class="text-primary-fixed font-semibold">Falalu Creative Studio</strong> as an architectural monograph come to life. Rather than employing aggressive transactional sales funnels, the layout prioritizes generous whitespace, tactile botanical typography, and structured milestone transparency.
+            </p>
+            <p>
+              By treating the customer journey as a structured three-phase blueprint, this layout creates natural authority, filtering high-discretion clientele toward deep, qualified consultations.
+            </p>
+          </div>
+
+          <div class="mt-2 flex flex-wrap items-center gap-3">
+            <a href="#" data-path="contact-estimates" class="group inline-flex items-center gap-2.5 h-11 px-5 rounded-md bg-surface-container-lowest text-primary font-label-lg text-label-lg font-semibold hover:bg-surface-container-low transition-colors">
+              <span>Book an Initial Design Consultation</span>
+              <span class="material-symbols-outlined text-[18px] leading-none transition-transform group-hover:translate-x-0.5">calendar_month</span>
+            </a>
+            <a href="#" data-path="projects-portfolio" class="inline-flex items-center h-11 px-5 rounded-md border border-primary-fixed-dim/30 text-primary-fixed font-label-lg text-label-lg hover:bg-primary transition-colors">
+              Explore Realized Folio
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4">
+          <div class="rounded-xl bg-primary/40 border border-primary-fixed-dim/10 p-6 flex flex-col gap-4">
+            <span class="font-label-sm text-label-sm uppercase tracking-[0.12em] text-primary-fixed font-semibold">Design Specifications</span>
+            <div class="flex flex-col gap-3 font-body-sm text-body-sm text-primary-fixed-dim">
+              <div class="flex items-center justify-between pb-2.5 border-b border-primary-fixed-dim/10">
+                <span>Typography</span>
+                <span class="text-surface-container-lowest font-semibold">Playfair / Plus Jakarta</span>
+              </div>
+              <div class="flex items-center justify-between pb-2.5 border-b border-primary-fixed-dim/10">
+                <span>Color Mood</span>
+                <span class="text-surface-container-lowest font-semibold">Evergreen &amp; Honed Stone</span>
+              </div>
+              <div class="flex items-center justify-between pb-2.5 border-b border-primary-fixed-dim/10">
+                <span>Editorial Grid</span>
+                <span class="text-surface-container-lowest font-semibold">12-Column Bespoke</span>
+              </div>
+              <div class="flex items-center justify-between pb-2.5 border-b border-primary-fixed-dim/10">
+                <span>Conversion Anchor</span>
+                <span class="text-surface-container-lowest font-semibold">3-Stage Blueprint</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Studio Attribution</span>
+                <span class="text-secondary-fixed font-semibold">Falalu Creative Studio</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div></main>
+
+
+<!-- FOOTER -->
+<footer class="w-full bg-primary-container text-on-primary-container border-t border-primary/40">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-12 md:py-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8">
+
+      <div class="sm:col-span-2 lg:col-span-4 flex flex-col">
+        <span class="font-display text-[22px] text-surface-container-lowest tracking-tight">Verdant</span>
+        <p class="font-body-sm text-body-sm text-primary-fixed-dim leading-relaxed mt-3 max-w-xs">
+          Crafting enduring landscapes where architecture and living nature coexist in balance.
+        </p>
+        <div class="mt-5 inline-flex items-center gap-2 self-start px-2.5 py-1 rounded bg-primary/50 font-label-sm text-label-sm uppercase tracking-[0.08em] text-primary-fixed">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+          <span>Falalu Creative Studio</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-3 flex flex-col">
+        <h4 class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-surface-container-lowest mb-4">Services</h4>
+        <ul class="flex flex-col gap-2.5 font-body-sm text-body-sm text-primary-fixed-dim">
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Master Landscape Planning</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Artisan Stone Patios</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Architectural Irrigation</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Specimen Tree Care</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Custom Water Elements</a></li>
+          <li><a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="services">Luxury Turf Installations</a></li>
+        </ul>
+      </div>
+
+      <div class="lg:col-span-2 flex flex-col">
+        <h4 class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-surface-container-lowest mb-4">Areas</h4>
+        <ul class="flex flex-col gap-2.5 font-body-sm text-body-sm text-primary-fixed-dim">
+          <li>North Shore</li>
+          <li>West Lake Estates</li>
+          <li>Highland Park</li>
+          <li>Meadowbrook</li>
+          <li>River Oaks</li>
+          <li>Piedmont Enclave</li>
+        </ul>
+      </div>
+
+      <div class="lg:col-span-3 flex flex-col">
+        <h4 class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-surface-container-lowest mb-4">Studio</h4>
+        <p class="font-body-sm text-body-sm text-primary-fixed-dim leading-relaxed">742 Botanical Way, Suite 400<br/>Architecture Row, Design District</p>
+        <p class="mt-3 font-body-sm text-body-sm text-primary-fixed-dim leading-relaxed">
+          <span class="text-surface-container-lowest font-medium">Hours</span> · Mon–Fri 8:00–18:00<br/>Sat by appointment
+        </p>
+        <a href="#" data-path="contact-estimates" class="group mt-4 inline-flex items-center gap-1.5 font-label-md text-label-md text-primary-fixed hover:text-surface-container-lowest transition-colors">
+          <span>Schedule a studio consultation</span>
+          <span class="material-symbols-outlined text-[16px] leading-none transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-10 md:mt-14 pt-6 border-t border-primary/40 flex flex-col md:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-primary-fixed-dim/70">
+      <p>© 2025 Verdant Outdoor Living. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-label-sm text-label-sm">
+        <a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="privacy-terms">Privacy</a>
+        <a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="privacy-terms">Terms</a>
+        <a class="hover:text-surface-container-lowest transition-colors" href="#" data-path="accessibility">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- SCRIPT · SCROLL REVEAL -->
+<script>
+(function () {
+  'use strict';
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealTargets = document.querySelectorAll('.reveal');
+
+  if (prefersReducedMotion) {
+    revealTargets.forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    revealTargets.forEach(el => observer.observe(el));
+  } else {
+    revealTargets.forEach(el => el.classList.add('is-visible'));
+  }
+})();
+</script>
+
+</body></html>
